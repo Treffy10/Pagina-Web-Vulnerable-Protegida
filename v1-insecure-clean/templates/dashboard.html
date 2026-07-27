@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - App Insegura v1</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        form.inline { display: inline; }
+    </style>
+</head>
+<body>
+    <h2>Bienvenido, {{ username }}</h2>
+    <a href="/logout">Cerrar sesión</a>
+
+    <h3>Subir archivo</h3>
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <!-- [VULN-07] Sin token CSRF -->
+        <!-- [VULN-04] El input file no restringe tipos (accept="*") -->
+        <input type="file" name="file" required>
+        <input type="text" name="description" placeholder="Descripción">
+        <button type="submit">Subir</button>
+    </form>
+
+    <h3>Mis archivos</h3>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+        </tr>
+        {% for f in files %}
+        <tr>
+            <td>{{ f['id'] }}</td>
+            <td><a href="/files/{{ f['id'] }}">{{ f['filename'] }}</a></td>
+            <!-- [VULN-23] XSS almacenado: la descripción se renderiza con |safe,
+                 permitiendo inyección de HTML/JS almacenado que se ejecuta para
+                 cualquier usuario que visualice el dashboard -->
+            <td>{{ f['description'] | safe }}</td>
+            <td>
+                <form class="inline" method="POST" action="/files/{{ f['id'] }}">
+                    <input type="text" name="description" placeholder="Nueva descripción">
+                    <button type="submit">Actualizar</button>
+                </form>
+                <form class="inline" method="POST" action="/files/{{ f['id'] }}/delete">
+                    <button type="submit">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <p style="margin-top:30px; font-size:12px; color:#888;">
+        Prueba de IDOR: intenta acceder a /files/1, /files/2, /files/3... aunque no sean tuyos.
+    </p>
+</body>
+</html>

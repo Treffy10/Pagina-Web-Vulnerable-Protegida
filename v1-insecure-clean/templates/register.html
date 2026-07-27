@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - App Insegura v1</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 80px auto; }
+        input { width: 100%; padding: 8px; margin: 6px 0; }
+        button { padding: 8px 16px; }
+    </style>
+</head>
+<body>
+    <h2>Crear cuenta</h2>
+    <form method="POST" action="/register">
+        <!-- [VULN-07] Sin token CSRF -->
+        <!-- [VULN-06] Sin validación de complejidad de contraseña en el cliente ni servidor -->
+        <label>Usuario</label>
+        <input type="text" name="username" required>
+        <label>Contraseña</label>
+        <input type="password" name="password" required>
+        <button type="submit">Registrarme</button>
+    </form>
+    <p>¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></p>
+</body>
+</html>

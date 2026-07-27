@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - App Insegura v1</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 80px auto; }
+        input { width: 100%; padding: 8px; margin: 6px 0; }
+        button { padding: 8px 16px; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h2>Iniciar sesión</h2>
+
+    {% if error %}
+        <!-- [VULN-22] XSS reflejado: el mensaje de error se inyecta sin escapar en algunos casos
+             si en el futuro se concatena input del usuario directamente (patrón de riesgo documentado) -->
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" action="/login">
+        <!-- [VULN-07] Sin token CSRF -->
+        <label>Usuario</label>
+        <input type="text" name="username" required>
+        <label>Contraseña</label>
+        <input type="password" name="password" required>
+        <button type="submit">Entrar</button>
+    </form>
+
+    <p>¿No tienes cuenta? <a href="/register">Regístrate</a></p>
+</body>
+</html>
