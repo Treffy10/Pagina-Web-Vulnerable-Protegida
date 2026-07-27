@@ -1,0 +1,12 @@
+node_modules/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+.env
+fase1-insegura/uploads/*
+!fase1-insegura/uploads/.gitkeep
+fase2-segura/uploads/*
+!fase2-segura/uploads/.gitkeep
+fase2-segura/data/
+npm-debug.log*

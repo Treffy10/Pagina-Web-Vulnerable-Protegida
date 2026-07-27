@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Login (Fase 1 - Inseguro)</title></head>
+<body>
+  <h1>Login</h1>
+  <% if (error) { %><p style="color:red"><%= error %></p><% } %>
+  <form method="POST" action="/login">
+    <input name="username" placeholder="usuario" /><br/>
+    <input name="password" type="password" placeholder="contrasena" /><br/>
+    <button type="submit">Entrar</button>
+  </form>
+  <p>Usuarios demo: admin/admin123, javier/password1</p>
+</body>
+</html>

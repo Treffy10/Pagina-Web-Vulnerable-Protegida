@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Notas (Fase 1 - Inseguro)</title></head>
+<body>
+  <h1>Notas de todos los usuarios (bug IDOR intencional)</h1>
+  <p>Sesion: <%= user || 'sin sesion' %> | <a href="/logout">Salir</a></p>
+  <form method="POST" action="/notes" enctype="multipart/form-data">
+    <input name="title" placeholder="titulo" /><br/>
+    <textarea name="content" placeholder="contenido"></textarea><br/>
+    <input type="file" name="file" /><br/>
+    <button type="submit">Crear</button>
+  </form>
+  <ul>
+    <% notes.forEach(n => { %>
+      <li>
+        #<%= n.id %> (user_id <%= n.user_id %>) - <b><%= n.title %></b>: <%= n.content %>
+        <% if (n.file_path) { %> - <a href="/uploads/<%= n.file_path %>">archivo</a><% } %>
+      </li>
+    <% }) %>
+  </ul>
+</body>
+</html>
