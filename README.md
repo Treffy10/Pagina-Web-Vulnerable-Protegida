@@ -27,12 +27,16 @@ Usuarios demo: `admin` / `admin123`, `javier` / `password1`.
 
 ```bash
 cd fase2-segura
-cp .env.example .env   # editar JWT_SECRET / COOKIE_SECRET
+cp .env.example .env   # editar segun la tabla de abajo
 npm install
 npm start
 ```
 
-Registrar un usuario primero:
+Usuario demo creado automaticamente al primer arranque (solo si la tabla
+de usuarios esta vacia): **`admin` / `Admin#2026`**. Se define en
+`src/config/db.js` (constantes `DEMO_ADMIN_USER` / `DEMO_ADMIN_PASSWORD`) -
+cambialo o borralo ahi si no lo quieres para produccion. Tambien puedes
+registrar otros usuarios:
 
 ```bash
 curl -X POST http://localhost:3002/api/auth/register \
@@ -41,6 +45,27 @@ curl -X POST http://localhost:3002/api/auth/register \
 ```
 
 Luego iniciar sesion en `http://localhost:3002/login`.
+
+### Que editar en `.env` (copiado de `.env.example`)
+
+| Variable | Que es | Que poner |
+|---|---|---|
+| `PORT` | Puerto donde escucha el servidor | `3002` funciona sin tocarlo; cambialo si ese puerto ya esta ocupado |
+| `NODE_ENV` | Entorno de ejecucion | `development` en tu maquina; `production` solo si lo despliegas de verdad (activa la cookie `secure`) |
+| `JWT_SECRET` | Clave para firmar los tokens de sesion (JWT) | Un texto aleatorio de al menos 16 caracteres, solo tuyo. Ejemplo rapido para generarlo: `openssl rand -hex 32` |
+| `COOKIE_SECRET` | Clave para firmar cookies | Igual que arriba, otro valor distinto al de `JWT_SECRET` |
+| `DB_PATH` | Ruta del archivo SQLite | Dejar `./data/database.sqlite` (se crea solo); cambialo solo si quieres la base en otro lugar |
+| `CORS_ORIGIN` | Origen permitido para llamar a la API | `http://localhost:3002` si abres la app desde el mismo navegador/puerto; si sirves el frontend desde otro puerto, pon ese origen exacto |
+| `MAX_UPLOAD_MB` | Tamano maximo de archivo adjunto | `5` esta bien para pruebas; sube el numero si necesitas adjuntar archivos mas grandes |
+
+Lo unico realmente obligatorio para que arranque es `JWT_SECRET` y
+`COOKIE_SECRET` (la app falla al iniciar si faltan o son muy cortos, a
+proposito, para no arrancar con secretos debiles). El resto tiene
+valores por defecto razonables.
+
+Nota: `fase1-insegura/` no usa `.env` a proposito -- el secreto de sesion
+esta hardcodeado en `server.js`, que es justamente una de las
+vulnerabilidades documentadas en el informe.
 
 ## Tests y pipeline
 
