@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Notas (Fase 2 - Seguro)</title></head>
+<body>
+  <h1>Mis notas</h1>
+  <form id="noteForm">
+    <input id="title" placeholder="titulo" /><br/>
+    <textarea id="content" placeholder="contenido"></textarea><br/>
+    <input id="file" type="file" /><br/>
+    <button type="submit">Crear</button>
+  </form>
+  <ul id="list"></ul>
+  <script>
+    async function loadNotes() {
+      const res = await fetch('/api/notes', { credentials: 'include' });
+      const notes = res.ok ? await res.json() : [];
+      document.getElementById('list').innerHTML = notes.map(n =>
+        `<li>#${n.id}: <b>${n.title}</b> - ${n.content}</li>`).join('');
+    }
+    document.getElementById('noteForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData();
+      fd.append('title', document.getElementById('title').value);
+      fd.append('content', document.getElementById('content').value);
+      const fileInput = document.getElementById('file');
+      if (fileInput.files[0]) fd.append('file', fileInput.files[0]);
+      await fetch('/api/notes', { method: 'POST', credentials: 'include', body: fd });
+      loadNotes();
+    });
+    loadNotes();
+  </script>
+</body>
+</html>
