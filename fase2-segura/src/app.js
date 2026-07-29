@@ -42,11 +42,16 @@ app.use(cookieParser(env.cookieSecret));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'views'));
 
+// JS de las vistas servido como archivo externo (no inline) para poder
+// mantener una CSP estricta (scriptSrc 'self' sin 'unsafe-inline').
+app.use('/js', express.static(path.join(__dirname, '..', 'public', 'js')));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/files', fileRoutes);
 
 app.get('/login', (req, res) => res.render('login'));
+app.get('/register', (req, res) => res.render('register'));
 app.get('/notes', (req, res) => res.render('notes'));
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 

@@ -27,12 +27,16 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // VULN-02: secreto de sesion hardcodeado en el codigo fuente.
-// VULN-03: cookie de sesion sin httpOnly/secure/sameSite.
+// VULN-03: cookie de sesion sin flags Secure ni SameSite explicitos (queda
+// en los defaults de express-session: secure=false, sameSite=false), por lo
+// que viaja igual por HTTP sin cifrar y se envia en peticiones cross-site.
+// httpOnly si viene activado por defecto en express-session, pero secure/
+// sameSite no, y eso es justamente lo que fase2 corrige explicitamente.
 app.use(session({
   secret: 'clave-secreta-super-facil-123',
   resave: false,
   saveUninitialized: true,
-  cookie: {} // sin httpOnly, sin secure, sin sameSite
+  cookie: {} // sin secure, sin sameSite (httpOnly viene por defecto de la libreria)
 }));
 
 // VULN-04: los archivos subidos se sirven publicamente desde /uploads
@@ -62,8 +66,6 @@ db.serialize(() => {
     if (row && row.c === 0) {
       db.run(`INSERT INTO users (username, password) VALUES (?, ?)`,
         ['admin', md5('admin123')]);
-      db.run(`INSERT INTO users (username, password) VALUES (?, ?)`,
-        ['javier', md5('password1')]);
     }
   });
 });

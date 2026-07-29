@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - App Segura v2 (Fase 2)</title>
+    <title>Registro - App Segura v2 (Fase 2)</title>
     <style>
         :root {
             --bg: #0f172a;
@@ -124,28 +124,28 @@
 </head>
 <body>
     <div class="container">
-        <h1>Iniciar sesión</h1>
-        <p class="subtitle">Fase 2 (segura): mismo flujo que la app vulnerable, pero con autenticación, validación y sesión reforzadas.</p>
+        <h1>Crear cuenta</h1>
+        <p class="subtitle">Registro con validación de esquema (usuario 3-50 caracteres, contraseña mínimo 8) y contraseñas guardadas con bcrypt.</p>
 
         <p id="msg" class="error"></p>
 
-        <form id="loginForm">
+        <form id="registerForm">
             <label>Usuario</label>
-            <input id="username" type="text" required>
+            <input id="username" type="text" required minlength="3" maxlength="50">
             <label>Contraseña</label>
-            <input id="password" type="password" required>
-            <button type="submit">Entrar</button>
+            <input id="password" type="password" required minlength="8">
+            <button type="submit">Registrarme</button>
         </form>
 
         <div class="footer">
-            ¿No tienes cuenta? <a href="/register">Regístrate</a>
+            ¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>
         </div>
 
         <div class="note">
-            Usuario demo: <strong>admin</strong> / <strong>Admin#2026</strong>. Login con sentencias preparadas,
-            contraseñas con bcrypt, rate limiting y cookie httpOnly + SameSite=Strict.
+            A diferencia de fase1, aquí el usuario y la contraseña se validan con Zod antes de tocar la base de datos
+            y el registro pasa por el mismo rate limiter que el login.
         </div>
     </div>
-    <script src="/js/login.js"></script>
+    <script src="/js/register.js"></script>
 </body>
 </html>

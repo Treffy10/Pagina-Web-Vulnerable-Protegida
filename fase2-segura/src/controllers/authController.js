@@ -42,4 +42,10 @@ function logoutHandler(req, res) {
   res.json({ message: 'Sesion cerrada' });
 }
 
-module.exports = { registerHandler, loginHandler, logoutHandler };
+// Usado por la vista para mostrar quien tiene la sesion iniciada.
+// Protegido por requireAuth (ver routes/authRoutes.js).
+function meHandler(req, res) {
+  res.json({ user: req.user });
+}
+
+module.exports = { registerHandler, loginHandler, logoutHandler, meHandler };

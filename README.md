@@ -21,7 +21,7 @@ npm install
 npm start
 ```
 
-Usuarios demo: `admin` / `admin123`, `javier` / `password1`.
+Usuario demo: `admin` / `admin123`.
 
 ## Como correr Fase 2 (puerto 3002)
 

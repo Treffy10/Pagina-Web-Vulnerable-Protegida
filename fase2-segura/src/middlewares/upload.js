@@ -26,7 +26,9 @@ const storage = multer.diskStorage({
 
 function fileFilter(req, file, cb) {
   if (!ALLOWED_MIME.has(file.mimetype)) {
-    return cb(new Error('Tipo de archivo no permitido'));
+    const err = new Error('Tipo de archivo no permitido');
+    err.status = 400; // sin esto, el error handler central lo devolvia como 500
+    return cb(err);
   }
   cb(null, true);
 }
@@ -37,4 +39,19 @@ const upload = multer({
   limits: { fileSize: env.maxUploadMb * 1024 * 1024 }
 });
 
-module.exports = upload;
+// Envuelve upload.single(field) para que cualquier error de multer
+// (mimetype no permitido, archivo demasiado grande, etc.) se reporte
+// como 400 en vez de caer al 500 generico del error handler central.
+function uploadSingle(fieldName) {
+  return (req, res, next) => {
+    upload.single(fieldName)(req, res, (err) => {
+      if (err) {
+        if (!err.status) err.status = 400;
+        return next(err);
+      }
+      next();
+    });
+  };
+}
+
+module.exports = { upload, uploadSingle };
