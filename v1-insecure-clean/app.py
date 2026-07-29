@@ -243,6 +243,11 @@ def delete_file(file_id):
 # API JSON simple (para mostrar métodos GET/POST/PUT/DELETE "básicos")
 # ------------------------------------------------------------------
 
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
 @app.route("/api/files", methods=["GET"])
 def api_list_files():
     # [VULN-20] Endpoint de API sin autenticación (falta @login_required) -> expone TODOS los archivos

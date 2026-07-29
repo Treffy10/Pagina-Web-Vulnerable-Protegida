@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Insegura v1 - Introducción</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: rgba(15, 23, 42, 0.96);
+            --surface-alt: rgba(30, 41, 59, 0.95);
+            --accent: #60a5fa;
+            --accent-strong: #38bdf8;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --border: rgba(148, 163, 184, 0.18);
+            --warning: #fbbf24;
+            --card: rgba(15, 23, 42, 0.82);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Inter', Arial, sans-serif;
+            background: radial-gradient(circle at top left, rgba(96, 165, 250, 0.18), transparent 28%),
+                        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.14), transparent 30%),
+                        linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            color: var(--text);
+        }
+
+        .page {
+            width: min(1140px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 40px 0 64px;
+        }
+
+        header {
+            padding: 32px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+        }
+
+        header h1 {
+            margin: 0 0 16px;
+            font-size: clamp(2.6rem, 4vw, 3.6rem);
+            letter-spacing: -0.04em;
+        }
+
+        header p {
+            max-width: 780px;
+            margin: 0 0 24px;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--muted);
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .button-row a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 150px;
+            padding: 14px 20px;
+            color: white;
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .button-row a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 22px 45px rgba(56, 189, 248, 0.28);
+        }
+
+        .hero-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            margin-top: 32px;
+        }
+
+        .card {
+            padding: 26px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+
+        .card p {
+            margin: 14px 0 0;
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        .section {
+            margin-top: 32px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 42px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+            border-radius: 999px;
+        }
+
+        .vuln-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+
+        .vuln-item {
+            padding: 22px;
+            background: var(--surface-alt);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            border-radius: 22px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .vuln-item:hover {
+            transform: translateY(-3px);
+            border-color: rgba(96, 165, 250, 0.4);
+        }
+
+        .vuln-item h3 {
+            margin: 0 0 10px;
+            font-size: 1.1rem;
+        }
+
+        .vuln-item p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .hint {
+            margin-top: 14px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(251, 191, 36, 0.12);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            color: #f8e77c;
+            font-size: 0.95rem;
+        }
+
+        .start-list {
+            display: grid;
+            gap: 16px;
+            padding: 24px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+        }
+
+        .start-step {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .start-step strong {
+            display: inline-flex;
+            min-width: 26px;
+            min-height: 26px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 100px;
+            background: rgba(96, 165, 250, 0.16);
+            color: var(--accent-strong);
+            font-size: 0.95rem;
+        }
+
+        .start-step span {
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        .note {
+            margin-top: 32px;
+            padding: 20px 22px;
+            color: #cbd5e1;
+            border: 1px dashed rgba(148, 163, 184, 0.4);
+            border-radius: 20px;
+            background: rgba(148, 163, 184, 0.05);
+        }
+
+        code {
+            color: #d6bcfa;
+            background: rgba(148, 163, 184, 0.12);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.96rem;
+        }
+
+        @media (max-width: 640px) {
+            .button-row {
+                flex-direction: column;
+            }
+
+            header {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <h1>App Insegura v1</h1>
+            <p>Laboratorio interactivo de seguridad. Esta aplicación muestra vulnerabilidades comunes y cómo pueden explotarse en un entorno web real.</p>
+            <div class="button-row">
+                <a href="/login">Ir al login</a>
+                <a href="/register">Crear cuenta</a>
+                <a href="/dashboard">Ver dashboard</a>
+            </div>
+            <div class="hero-grid">
+                <div class="card">
+                    <h2>Objetivo</h2>
+                    <p>Entender los riesgos de malas prácticas de desarrollo: inyección SQL, XSS, CSRF, IDOR, subida insegura de archivos y APIs expuestas.</p>
+                </div>
+                <div class="card">
+                    <h2>Audiencia</h2>
+                    <p>Desarrolladores, analistas de seguridad y estudiantes que quieran identificar y explotar fallos en una app de ejemplo.</p>
+                </div>
+            </div>
+        </header>
+
+        <section class="section">
+            <div class="section-title">Vulnerabilidades disponibles</div>
+            <div class="vuln-grid">
+                <div class="vuln-item">
+                    <h3>Inyección SQL</h3>
+                    <p>Permite manipular consultas de base de datos ingresando comillas y sentencias SQL en el login o registro.</p>
+                    <div class="hint">Prueba payloads como <code>admin' --</code>.</div>
+                </div>
+                <div class="vuln-item">
+                    <h3>XSS</h3>
+                    <p>Existe XSS reflejado y almacenado al ingresar HTML/JS en campos de texto y descripciones de archivos.</p>
+                    <div class="hint">Envía descripciones maliciosas para ejecutar código en el dashboard.</div>
+                </div>
+                <div class="vuln-item">
+                    <h3>CSRF</h3>
+                    <p>Los formularios POST no usan tokens CSRF, lo que permite acciones no autorizadas desde otro sitio.</p>
+                    <div class="hint">Prueba ataques silenciosos a <code>/upload</code> y <code>/files/&lt;id&gt;/delete</code>.</div>
+                </div>
+                <div class="vuln-item">
+                    <h3>Subida insegura</h3>
+                    <p>El sistema acepta archivos sin validar extensión ni contenido, y no protege contra path traversal.</p>
+                    <div class="hint">Carga archivos con rutas como <code>../../app.py</code>.</div>
+                </div>
+                <div class="vuln-item">
+                    <h3>IDOR</h3>
+                    <p>Los archivos se acceden por ID sin validar si pertenecen al usuario autenticado.</p>
+                    <div class="hint">Intenta descargar o borrar archivos de otros usuarios cambiando el ID.</div>
+                </div>
+                <div class="vuln-item">
+                    <h3>API pública</h3>
+                    <p>El endpoint <code>/api/files</code> entrega todos los registros sin autenticación.</p>
+                    <div class="hint">Revisa el contenido expuesto del servidor.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-title">Cómo empezar</div>
+            <div class="start-list">
+                <div class="start-step"><strong>1</strong><span>Regístrate con un usuario nuevo y accede al dashboard.</span></div>
+                <div class="start-step"><strong>2</strong><span>Intenta iniciar sesión con credenciales válidas y luego con un payload de SQLi.</span></div>
+                <div class="start-step"><strong>3</strong><span>Sobreescribe la descripción de un archivo con HTML/JS para descubrir XSS.</span></div>
+                <div class="start-step"><strong>4</strong><span>Sube un archivo con nombre malicioso y prueba a acceder a <code>/files/&lt;id&gt;</code>.</span></div>
+                <div class="start-step"><strong>5</strong><span>Visita <code>/api/files</code> y observa la información expuesta sin autenticación.</span></div>
+            </div>
+        </section>
+
+        <section class="note">
+            <strong>Nota:</strong> Esta aplicación es solo para fines educativos y de prueba. No la uses en producción ni con datos reales.
+        </section>
+    </div>
+</body>
+</html>
