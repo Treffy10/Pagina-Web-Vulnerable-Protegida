@@ -120,11 +120,15 @@
             color: var(--text);
             line-height: 1.65;
         }
+
+        .topbar { margin-bottom: 12px; color: var(--accent); font-weight: 800; }
+        .topbar a { color: inherit; text-decoration: none; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Iniciar sesión</h1>
+        <div class="topbar"><a href="/">App Segura v2</a></div>
         <p class="subtitle">Fase 2 (segura): mismo flujo que la app vulnerable, pero con autenticación, validación y sesión reforzadas.</p>
 
         <p id="msg" class="error"></p>
