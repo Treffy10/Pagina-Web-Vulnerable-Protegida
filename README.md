@@ -1,97 +1,61 @@
-# App Insegura — Versión 1 (sin DevSecOps)
+# Laboratorio SecDevOps — App Vulnerable vs App Protegida (v1 / v2)
 
-Aplicación Flask mínima con **login**, **subida de archivos** y **CRUD básico**
-(GET / POST / UPDATE / DELETE), construida **sin** prácticas de DevSecOps para
-servir como línea base de un ejercicio de seguridad comparativo (v1 vs v2).
+Comparativa práctica de una aplicación Flask antes y después de aplicar
+prácticas de SecDevOps.
 
-⚠️ **Este código contiene vulnerabilidades introducidas deliberadamente.**
-No usar en producción, ni exponerlo a internet.
+```
+.
+├── v1-insecure-clean/     App vulnerable (línea base, sin cambios)
+├── v2-secure/             App corregida — HTTPS/TLS, sin las 26 vulnerabilidades de v1
+├── pentest/               Guía de pruebas de penetración + automatización sqlmap + evidencias
+└── database/              Bases de datos (código + datos) de ambas versiones
+```
 
-## Instalación
+## v1 — App Insegura
 
-### Arranque local
+Sin cambios respecto a la línea base del ejercicio. Ver `v1-insecure-clean/README.md`
+para el detalle de las 26 vulnerabilidades introducidas deliberadamente
+(SQLi, XSS, CSRF, IDOR, path traversal, RCE, etc.) y cómo explotarlas.
+
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+cd v1-insecure-clean
 pip install -r requirements.txt
-python app.py
+python app.py            # http://localhost:5000
 ```
 
-### Arranque con Docker
-Asegúrate de tener Docker instalado y ejecutándose.
+## v2 — App Segura (nueva)
+
+Misma funcionalidad que v1, con cada vulnerabilidad corregida y **servida
+sobre HTTPS/TLS**. Ver `v2-secure/README.md` para la tabla completa de
+correcciones (`VULN-XX` → `FIX-VULN-XX`).
 
 ```bash
-docker build -t pagina-vulnerable:v1 .
-docker run -p 5000:5000 --name pagina-vulnerable-v1 pagina-vulnerable:v1
+cd v2-secure
+pip install -r requirements.txt
+bash certs/generate_cert.sh   # genera certificado TLS autofirmado
+python app.py                 # https://localhost:5443
 ```
 
-Después de iniciar el contenedor, accede a `http://localhost:5000`.
+## Pruebas de penetración
 
-> Nota: los datos de `uploads/` y la base de datos SQLite se almacenan dentro del contenedor por defecto. Si quieres conservarlos entre ejecuciones, monta volúmenes:
->
-> ```bash
-docker run -p 5000:5000 \
->   -v "%cd%/uploads:/app/uploads" \
->   -v "%cd%/database.db:/app/database.db" \
->   --name pagina-vulnerable-v1 pagina-vulnerable:v1
-> ```
+Ver [`pentest/PENTEST.md`](pentest/PENTEST.md): metodología completa, mapeo
+a OWASP Top 10, y el hallazgo principal — **inyección SQL en `/login`
+explotada de forma automatizada con `sqlmap` para volcar las credenciales
+de acceso** (`pentest/sqlmap_dump_v1.sh`), con verificación de que el mismo
+ataque falla contra v2 (`pentest/sqlmap_verify_v2.sh`). Incluye además una
+prueba de concepto ejecutable sin dependencias externas
+(`pentest/poc_sqli_login.py`) con evidencia real capturada en
+`pentest/evidence/`.
 
-La app corre en `http://localhost:5000`. La base de datos SQLite (`database.db`)
-y la carpeta `uploads/` se crean automáticamente al iniciar si no existen.
+## Bases de datos
 
-## Flujo básico
+`database/v1/` y `database/v2/` contienen un `database.db` (SQLite) y su
+export `.sql` de ejemplo para cada versión — ver `database/generate_sample_dbs.py`
+para regenerarlos. Sirven para comparar directamente cómo se almacenan las
+contraseñas en cada versión (MD5 sin sal en v1 vs. bcrypt en v2).
 
-1. `/register` — crear usuario
-2. `/login` — iniciar sesión
-3. `/dashboard` — subir archivos, ver, actualizar descripción, eliminar
-4. `/tools/execute` — ejecutar comandos del sistema con entrada del usuario (RCE explícita)
-5. `/api/files` — endpoint JSON (sin autenticación, ver hallazgos)
+## Advertencia
 
-## Vulnerabilidades introducidas (para el informe técnico)
+Ambas aplicaciones son material educativo. **No exponer a Internet ni usar
+con datos reales**, especialmente la v1.
 
-Cada una está marcada en el código con el comentario `# [VULN-XX]`.
-
-| ID | Categoría (OWASP) | Descripción | Ubicación |
-|----|--------------------|-------------|-----------|
-| VULN-01 | A02 Cryptographic Failures | `secret_key` hardcodeada en el código fuente | `app.py` |
-| VULN-02 | A05 Security Misconfiguration | Cookies de sesión sin `HttpOnly`/`Secure`/`SameSite` | `app.py` |
-| VULN-03 | A05 Security Misconfiguration | Sin límite de tamaño de subida (`MAX_CONTENT_LENGTH`) | `app.py` |
-| VULN-04 | A04 Insecure Design | Sin whitelist de extensiones/MIME en subida de archivos | `app.py`, `dashboard.html` |
-| VULN-05 | A02 Cryptographic Failures | Contraseñas con MD5 sin sal | `app.py` (`md5_hash`) |
-| VULN-06 | A07 Identification & Auth Failures | Sin validación de complejidad de contraseña | `register.html` |
-| VULN-07 | A01 Broken Access Control (CSRF) | Sin token CSRF en formularios | todos los `<form>` |
-| VULN-08 | A03 Injection (SQLi) | SQLi en registro de usuario vía `executescript` | `app.py` (`/register`) |
-| VULN-09 | A05 Security Misconfiguration | Mensajes de error verbosos (stack trace expuesto) | `app.py` (`/register`) |
-| VULN-10 | A03 Injection (SQLi) | SQLi en login — permite bypass de autenticación | `app.py` (`/login`) |
-| VULN-11 | A07 Auth Failures | Sin rate limiting / bloqueo por intentos fallidos | `app.py` (`/login`) |
-| VULN-12 | A07 Auth Failures | Sin CAPTCHA ni protección anti fuerza bruta | `app.py` (`/login`) |
-| VULN-13 | A01 Broken Access Control | Sesión validada solo por existencia, sin expiración/rotación | `app.py` (`/dashboard`) |
-| VULN-14 | A01 Broken Access Control | Filtrado de usuario inconsistente entre endpoints | `app.py` |
-| VULN-15 | A03 Injection (Path Traversal) | Nombre de archivo subido sin sanitizar | `app.py` (`/upload`) |
-| VULN-16 | A03 Injection (SQLi) | SQLi en descripción de archivo al subir | `app.py` (`/upload`) |
-| VULN-17 | A01 Broken Access Control (IDOR) | Lectura/edición/borrado de archivos de otros usuarios cambiando el ID | `app.py` (`/files/<id>`) |
-| VULN-18 | Deuda técnica / mala práctica REST | Uso de POST en lugar de PUT/PATCH | `app.py` (`update_file`) |
-| VULN-19 | A03 Injection (SQLi) | SQLi al actualizar descripción | `app.py` (`update_file`) |
-| VULN-20 | A01 Broken Access Control | Endpoint `/api/files` sin autenticación, expone datos de todos los usuarios | `app.py` |
-| VULN-21 | A05 Security Misconfiguration | `debug=True` en el servidor (debugger interactivo / RCE potencial) | `app.py` (`__main__`) |
-| VULN-22 | A03 Injection (XSS reflejado) | Patrón de riesgo en render de mensajes de error | `login.html` |
-| VULN-23 | A03 Injection (XSS almacenado) | Descripción de archivo renderizada con filtro `\|safe` | `dashboard.html` |
-| VULN-24 | A06 Vulnerable & Outdated Components | Dependencias fijadas a versiones antiguas con CVEs conocidos | `requirements.txt` |
-| VULN-25 | Proceso / DevSecOps | Sin pipeline CI/CD, sin SAST/DAST/dependency scanning, sin tests | Repositorio completo |
-| VULN-26 | A03 Injection / RCE | Ejecución de comandos del sistema con `subprocess.run(..., shell=True)` y entrada del usuario | `app.py` (`/tools/execute`) |
-
-## Cómo explotar algunos de estos hallazgos (para evidencia en el informe)
-
-- **Bypass de login (VULN-10):** en el campo usuario, probar `admin' -- ` (con
-  el usuario `admin` ya registrado) o `' OR '1'='1' -- `.
-- **IDOR (VULN-17):** iniciar sesión con dos usuarios distintos, subir un
-  archivo con cada uno, y acceder a `/files/<id>` de un archivo ajeno.
-- **XSS almacenado (VULN-23):** subir un archivo con descripción
-  `<script>alert(document.cookie)</script>` y ver que se ejecuta en el dashboard.
-- **Path traversal (VULN-15):** interceptar la petición de subida con Burp/curl
-  y modificar el nombre de archivo a algo como `../app.py`.
-
-Siguiente paso: documentar cada hallazgo con evidencia (capturas, request/response)
-y pasar a la **versión 2**, corrigiendo cada punto con prácticas de SecDevOps
-(prepared statements, hashing con bcrypt/argon2, control de acceso por
-ownership, CSP, CI/CD con SAST/DAST/dependency scanning, etc.).
