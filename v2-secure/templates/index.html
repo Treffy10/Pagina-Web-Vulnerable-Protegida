@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Segura v2 - Introducción</title>
+    <style>
+        :root {
+            --surface: rgba(6, 20, 16, 0.96);
+            --surface-alt: rgba(15, 30, 25, 0.95);
+            --accent: #34d399;
+            --accent-strong: #10b981;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --border: rgba(148, 163, 184, 0.18);
+            --card: rgba(6, 20, 16, 0.82);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh; font-family: 'Inter', Arial, sans-serif;
+            background: radial-gradient(circle at top left, rgba(52, 211, 153, 0.18), transparent 28%),
+                        radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.14), transparent 30%),
+                        linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            color: var(--text);
+        }
+        .page { width: min(1140px, calc(100% - 32px)); margin: 0 auto; padding: 40px 0 64px; }
+        header {
+            padding: 32px; background: var(--surface); border: 1px solid var(--border); border-radius: 28px;
+            backdrop-filter: blur(18px); box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+        }
+        header h1 { margin: 0 0 16px; font-size: clamp(2.6rem, 4vw, 3.6rem); letter-spacing: -0.04em; }
+        header p { max-width: 780px; margin: 0 0 24px; font-size: 1.05rem; line-height: 1.8; color: var(--muted); }
+        .button-row { display: flex; flex-wrap: wrap; gap: 12px; }
+        .button-row a {
+            display: inline-flex; align-items: center; justify-content: center; min-width: 150px;
+            padding: 14px 20px; color: #06281c; background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            border-radius: 999px; text-decoration: none; font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .button-row a:hover { transform: translateY(-2px); box-shadow: 0 22px 45px rgba(16, 185, 129, 0.28); }
+        .hero-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 32px; }
+        .card { padding: 26px; background: var(--card); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2); }
+        .card h2 { margin-top: 0; font-size: 1.3rem; }
+        .card p { margin: 14px 0 0; color: var(--muted); line-height: 1.75; }
+        .section { margin-top: 32px; }
+        .section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; font-size: 1.4rem; font-weight: 700; color: white; }
+        .section-title::before { content: ''; width: 42px; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-strong)); border-radius: 999px; }
+        .vuln-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+        .vuln-item { padding: 22px; background: var(--surface-alt); border: 1px solid rgba(148, 163, 184, 0.14); border-radius: 22px; transition: transform 0.2s ease, border-color 0.2s ease; }
+        .vuln-item:hover { transform: translateY(-3px); border-color: rgba(52, 211, 153, 0.4); }
+        .vuln-item h3 { margin: 0 0 10px; font-size: 1.1rem; }
+        .vuln-item p { margin: 0; color: var(--muted); line-height: 1.7; }
+        .hint {
+            margin-top: 14px; padding: 14px 16px; border-radius: 18px; background: rgba(52, 211, 153, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.2); color: #b8f5da; font-size: 0.95rem;
+        }
+        .note { margin-top: 32px; padding: 20px 22px; color: #cbd5e1; border: 1px dashed rgba(148, 163, 184, 0.4); border-radius: 20px; background: rgba(148, 163, 184, 0.05); }
+        code { color: #86efac; background: rgba(148, 163, 184, 0.12); padding: 2px 6px; border-radius: 6px; font-size: 0.96rem; }
+        @media (max-width: 640px) { .button-row { flex-direction: column; } header { padding: 24px; } }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <h1>App Segura v2</h1>
+            <p>Misma aplicación que la v1, pero con las prácticas de SecDevOps aplicadas: cada vulnerabilidad detectada en v1 fue corregida y verificada.</p>
+            <div class="button-row">
+                <a href="{{ url_for('login') }}">Ir al login</a>
+                <a href="{{ url_for('register') }}">Crear cuenta</a>
+                <a href="{{ url_for('dashboard') }}">Ver dashboard</a>
+            </div>
+            <div class="hero-grid">
+                <div class="card">
+                    <h2>Objetivo</h2>
+                    <p>Demostrar la remediación de inyección SQL, XSS, CSRF, IDOR, subida insegura de archivos, RCE y APIs expuestas presentes en la v1.</p>
+                </div>
+                <div class="card">
+                    <h2>Transporte</h2>
+                    <p>Servida exclusivamente sobre HTTPS (TLS) con cabeceras HSTS, CSP y cookies <code>Secure</code>.</p>
+                </div>
+            </div>
+        </header>
+
+        <section class="section">
+            <div class="section-title">Controles implementados</div>
+            <div class="vuln-grid">
+                <div class="vuln-item">
+                    <h3>Sin inyección SQL</h3>
+                    <p>Todas las consultas usan parámetros vinculados (<code>?</code>) en lugar de concatenar texto.</p>
+                    <div class="hint">El payload <code>admin' --</code> ya no tiene efecto.</div>
+                </div>
+                <div class="vuln-item">
+                    <h3>Sin XSS</h3>
+                    <p>Autoescape de Jinja2 activo en todas las plantillas; se eliminó el filtro <code>|safe</code>.</p>
+                    <div class="hint">El HTML/JS ingresado se muestra como texto, nunca se ejecuta.</div>
+                </div>
+                <div class="vuln-item">
+                    <h3>CSRF</h3>
+                    <p>Todos los formularios incluyen token CSRF validado por <code>Flask-WTF</code>.</p>
+                    <div class="hint">Peticiones sin token válido son rechazadas (400).</div>
+                </div>
+                <div class="vuln-item">
+                    <h3>Subida segura</h3>
+                    <p>Whitelist de extensiones, límite de tamaño y nombre de almacenamiento aleatorio (sin path traversal).</p>
+                    <div class="hint"><code>../../app.py</code> ya no es un nombre de archivo válido.</div>
+                </div>
+                <div class="vuln-item">
+                    <h3>Sin IDOR</h3>
+                    <p>Todo acceso a archivos valida que pertenezcan al usuario autenticado.</p>
+                    <div class="hint">Cambiar el ID en la URL retorna 404, no el archivo ajeno.</div>
+                </div>
+                <div class="vuln-item">
+                    <h3>API autenticada</h3>
+                    <p><code>/api/files</code> requiere sesión activa y solo devuelve los archivos del usuario.</p>
+                    <div class="hint">Sin sesión, responde con redirección al login.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="note">
+            <strong>Nota:</strong> Esta aplicación forma parte de un laboratorio educativo de SecDevOps (comparativa v1/v2). No expongas ninguna de las dos versiones a Internet.
+        </section>
+    </div>
+</body>
+</html>

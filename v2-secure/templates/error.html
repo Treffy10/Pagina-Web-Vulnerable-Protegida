@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error {{ code }} - App Segura v2</title>
+    <style>
+        body {
+            margin: 0; min-height: 100vh; font-family: 'Inter', Arial, sans-serif;
+            background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            color: #e2e8f0; display: grid; place-items: center; padding: 24px;
+        }
+        .box {
+            width: min(480px, 100%); padding: 32px; background: rgba(6, 20, 16, 0.96);
+            border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 28px; text-align: center;
+        }
+        h1 { font-size: 3rem; margin: 0 0 8px; color: #34d399; }
+        p { color: #94a3b8; margin: 0 0 20px; }
+        a { color: #34d399; text-decoration: none; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>{{ code }}</h1>
+        <!-- Mensaje genérico: nunca se exponen trazas internas ni detalles de la BD. -->
+        <p>{{ message }}</p>
+        <a href="{{ url_for('index') }}">Volver al inicio</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - App Segura v2</title>
+    <style>
+        :root {
+            --surface: rgba(6, 20, 16, 0.96);
+            --accent: #34d399;
+            --accent-strong: #10b981;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --border: rgba(148, 163, 184, 0.18);
+            --danger: #f87171;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh; font-family: 'Inter', Arial, sans-serif;
+            background: radial-gradient(circle at top left, rgba(52, 211, 153, 0.18), transparent 28%),
+                        linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            color: var(--text); display: grid; place-items: center; padding: 24px;
+        }
+        .container {
+            width: min(480px, 100%); padding: 32px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 28px;
+            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.28); backdrop-filter: blur(16px);
+        }
+        h1 { margin: 0 0 10px; font-size: 2rem; letter-spacing: -0.03em; }
+        p.subtitle { margin: 0 0 24px; color: var(--muted); line-height: 1.7; }
+        form { display: grid; gap: 16px; }
+        label { font-size: 0.95rem; color: var(--muted); }
+        input {
+            width: 100%; padding: 14px 16px; border-radius: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.18); background: rgba(15, 23, 42, 0.55);
+            color: var(--text); font-size: 1rem;
+        }
+        button {
+            width: 100%; padding: 14px 16px; border: none; border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            color: #06281c; font-size: 1rem; font-weight: 700; cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        button:hover { transform: translateY(-1px); }
+        .error { color: var(--danger); font-weight: 600; margin: 0 0 12px; }
+        .footer { margin-top: 22px; text-align: center; color: var(--muted); font-size: 0.95rem; }
+        .footer a { color: var(--accent); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        .secondary-button {
+            display: inline-flex; align-items: center; justify-content: center; width: 100%;
+            padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(52, 211, 153, 0.24);
+            background: rgba(15, 23, 42, 0.7); color: var(--accent); text-decoration: none;
+            font-weight: 700; transition: background 0.2s ease, transform 0.2s ease;
+        }
+        .secondary-button:hover { background: rgba(52, 211, 153, 0.14); transform: translateY(-1px); }
+        .note {
+            margin-top: 24px; padding: 16px 18px; border-radius: 18px;
+            background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.18);
+            color: var(--text); line-height: 1.65;
+        }
+        ul.policy { margin: 0 0 4px; padding-left: 18px; color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Crear cuenta</h1>
+        <p class="subtitle">Registro con validación de usuario, política de contraseñas y almacenamiento con bcrypt.</p>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label>Usuario</label>
+            <input type="text" name="username" required minlength="3" maxlength="32" pattern="[A-Za-z0-9_.\-]+" autocomplete="username">
+            <label>Contraseña</label>
+            <input type="password" name="password" required minlength="10" autocomplete="new-password">
+            <ul class="policy">
+                <li>Mínimo 10 caracteres</li>
+                <li>Al menos una mayúscula, una minúscula y un número</li>
+            </ul>
+            <button type="submit">Registrarme</button>
+        </form>
+
+        <div style="display: grid; gap: 12px; margin-top: 20px;">
+            <a href="{{ url_for('index') }}" class="secondary-button">Volver a la página principal</a>
+        </div>
+
+        <div class="footer">
+            ¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a>
+        </div>
+
+        <div class="note">
+            Las contraseñas se almacenan con <strong>bcrypt</strong> (salt aleatorio, factor de coste 12). Nunca en texto plano ni con hashes sin sal.
+        </div>
+    </div>
+</body>
+</html>
