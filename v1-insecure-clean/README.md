@@ -24,7 +24,8 @@ y la carpeta `uploads/` se crean automáticamente al iniciar.
 1. `/register` — crear usuario
 2. `/login` — iniciar sesión
 3. `/dashboard` — subir archivos, ver, actualizar descripción, eliminar
-4. `/api/files` — endpoint JSON (sin autenticación, ver hallazgos)
+4. `/tools/execute` — ejecutar comandos del sistema con entrada del usuario (RCE explícita)
+5. `/api/files` — endpoint JSON (sin autenticación, ver hallazgos)
 
 ## Vulnerabilidades introducidas (para el informe técnico)
 
@@ -57,6 +58,7 @@ Cada una está marcada en el código con el comentario `# [VULN-XX]`.
 | VULN-23 | A03 Injection (XSS almacenado) | Descripción de archivo renderizada con filtro `\|safe` | `dashboard.html` |
 | VULN-24 | A06 Vulnerable & Outdated Components | Dependencias fijadas a versiones antiguas con CVEs conocidos | `requirements.txt` |
 | VULN-25 | Proceso / DevSecOps | Sin pipeline CI/CD, sin SAST/DAST/dependency scanning, sin tests | Repositorio completo |
+| VULN-26 | A03 Injection / RCE | Ejecución de comandos del sistema con `subprocess.run(..., shell=True)` y entrada del usuario | `app.py` (`/tools/execute`) |
 
 ## Cómo explotar algunos de estos hallazgos (para evidencia en el informe)
 

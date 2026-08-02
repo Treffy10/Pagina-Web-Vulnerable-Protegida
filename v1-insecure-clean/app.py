@@ -16,6 +16,7 @@ from flask import Flask, request, render_template, redirect, url_for, session, s
 import sqlite3
 import hashlib
 import os
+import subprocess
 
 # [VULN-01] Secret key hardcodeada en el código fuente (debería ir en variable de entorno / secrets manager)
 app = Flask(__name__)
@@ -146,6 +147,46 @@ def logout():
 # ------------------------------------------------------------------
 # CRUD DE ARCHIVOS (GET / POST / UPDATE / DELETE)
 # ------------------------------------------------------------------
+
+@app.route("/tools/execute", methods=["POST"])
+def execute_command():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    command = request.form.get("command", "")
+    db = get_db()
+    files = db.execute("SELECT * FROM files WHERE user_id = ?", (session["user_id"],)).fetchall()
+
+    # [VULN-26] RCE explícita: ejecución de comandos del sistema con entrada del usuario
+    # sin sanitizar, usando shell=True y sin controles de seguridad.
+    try:
+        completed = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        output = completed.stdout + completed.stderr
+        if not output:
+            output = "[sin salida]"
+        status = "ok"
+    except subprocess.TimeoutExpired:
+        output = "El comando excedió el tiempo límite de 5 segundos."
+        status = "timeout"
+    except Exception as exc:
+        output = f"Error al ejecutar comando: {exc}"
+        status = "error"
+
+    return render_template(
+        "dashboard.html",
+        files=files,
+        username=session.get("username"),
+        command_output=output,
+        command=command,
+        command_status=status,
+    )
+
 
 @app.route("/dashboard")
 def dashboard():

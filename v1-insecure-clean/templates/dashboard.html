@@ -145,6 +145,30 @@
             font-size: 0.95rem;
         }
 
+        .subsection {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(148, 163, 184, 0.16);
+        }
+
+        .subsection h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: var(--accent-strong);
+        }
+
+        .subsection pre {
+            margin: 12px 0 0;
+            padding: 14px;
+            border-radius: 14px;
+            background: rgba(2, 6, 23, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            color: #f8fafc;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
         .table-wrapper {
             overflow-x: auto;
         }
@@ -267,6 +291,19 @@
                     <button type="submit">Subir</button>
                 </form>
                 <p class="note">Ten en cuenta que el nombre de archivo y la descripción no se sanitizan, lo que genera múltiples vectores de ataque.</p>
+
+                <div class="subsection">
+                    <h3>Ejecutar comando del sistema</h3>
+                    <form method="POST" action="/tools/execute">
+                        <input type="text" name="command" value="{{ command or '' }}" placeholder="Ej. whoami o ipconfig">
+                        <button type="submit">Ejecutar</button>
+                    </form>
+                    {% if command_output %}
+                    <pre>Comando: {{ command }}
+
+{{ command_output }}</pre>
+                    {% endif %}
+                </div>
             </div>
 
             <div class="panel">
