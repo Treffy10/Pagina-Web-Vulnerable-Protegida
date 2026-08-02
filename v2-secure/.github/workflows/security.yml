@@ -1,0 +1,36 @@
+name: DevSecOps Pipeline - App Segura v2
+
+on:
+  push:
+    paths:
+      - "v2-secure/**"
+  pull_request:
+    paths:
+      - "v2-secure/**"
+
+jobs:
+  sast-and-dependency-scan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: v2-secure
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+          pip install bandit pip-audit
+
+      - name: SAST - Bandit (analisis estatico del codigo Python)
+        run: bandit -r . -x ./tests -f screen
+
+      - name: Dependency scan - pip-audit (CVEs en dependencias)
+        run: pip-audit -r requirements.txt
+
+      - name: Compilar / smoke test
+        run: python -m py_compile app.py

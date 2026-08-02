@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+database.db
+uploads/*
+!uploads/.gitkeep
+venv/
+.venv/
+.secret_key
+security.log
+certs/*.pem
+!certs/generate_cert.sh

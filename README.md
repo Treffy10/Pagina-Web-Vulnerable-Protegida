@@ -1,61 +1,79 @@
-# Laboratorio SecDevOps — App Vulnerable vs App Protegida (v1 / v2)
+# Proyecto SecDevOps: App de notas con login y upload (Fase 1 vs Fase 2)
 
-Comparativa práctica de una aplicación Flask antes y después de aplicar
-prácticas de SecDevOps.
+Este repositorio contiene dos versiones de la misma aplicacion (login,
+subida de archivos y CRUD - GET/POST/PUT/DELETE - sobre "notas"):
 
-```
-.
-├── v1-insecure-clean/     App vulnerable (línea base, sin cambios)
-├── v2-secure/             App corregida — HTTPS/TLS, sin las 26 vulnerabilidades de v1
-├── pentest/               Guía de pruebas de penetración + automatización sqlmap + evidencias
-└── database/              Bases de datos (código + datos) de ambas versiones
-```
+- `fase1-insegura/`: version construida sin DevSecOps, con vulnerabilidades
+  intencionales para fines de analisis y aprendizaje. **No ejecutar expuesta
+  a internet ni usar sus patrones como referencia.**
+- `fase2-segura/`: version refactorizada con arquitectura en capas
+  (routes/controllers/services/models), practicas SecDevOps y las
+  vulnerabilidades de fase 1 corregidas.
 
-## v1 — App Insegura
+Ver `informe-tecnico.docx` para el detalle de contexto, hallazgos y
+remediaciones.
 
-Sin cambios respecto a la línea base del ejercicio. Ver `v1-insecure-clean/README.md`
-para el detalle de las 26 vulnerabilidades introducidas deliberadamente
-(SQLi, XSS, CSRF, IDOR, path traversal, RCE, etc.) y cómo explotarlas.
+## Como correr Fase 1 (puerto 3001)
 
 ```bash
-cd v1-insecure-clean
-pip install -r requirements.txt
-python app.py            # http://localhost:5000
+cd fase1-insegura
+npm install
+npm start
 ```
 
-## v2 — App Segura (nueva)
+Usuario demo: `admin` / `admin123`.
 
-Misma funcionalidad que v1, con cada vulnerabilidad corregida y **servida
-sobre HTTPS/TLS**. Ver `v2-secure/README.md` para la tabla completa de
-correcciones (`VULN-XX` → `FIX-VULN-XX`).
+## Como correr Fase 2 (puerto 3002)
 
 ```bash
-cd v2-secure
-pip install -r requirements.txt
-bash certs/generate_cert.sh   # genera certificado TLS autofirmado
-python app.py                 # https://localhost:5443
+cd fase2-segura
+cp .env.example .env   # editar segun la tabla de abajo
+npm install
+npm start
 ```
 
-## Pruebas de penetración
+Usuario demo creado automaticamente al primer arranque (solo si la tabla
+de usuarios esta vacia): **`admin` / `Admin#2026`**. Se define en
+`src/config/db.js` (constantes `DEMO_ADMIN_USER` / `DEMO_ADMIN_PASSWORD`) -
+cambialo o borralo ahi si no lo quieres para produccion. Tambien puedes
+registrar otros usuarios:
 
-Ver [`pentest/PENTEST.md`](pentest/PENTEST.md): metodología completa, mapeo
-a OWASP Top 10, y el hallazgo principal — **inyección SQL en `/login`
-explotada de forma automatizada con `sqlmap` para volcar las credenciales
-de acceso** (`pentest/sqlmap_dump_v1.sh`), con verificación de que el mismo
-ataque falla contra v2 (`pentest/sqlmap_verify_v2.sh`). Incluye además una
-prueba de concepto ejecutable sin dependencias externas
-(`pentest/poc_sqli_login.py`) con evidencia real capturada en
-`pentest/evidence/`.
+```bash
+curl -X POST http://localhost:3002/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"javier","password":"unaClaveSegura123"}'
+```
 
-## Bases de datos
+Luego iniciar sesion en `http://localhost:3002/login`.
 
-`database/v1/` y `database/v2/` contienen un `database.db` (SQLite) y su
-export `.sql` de ejemplo para cada versión — ver `database/generate_sample_dbs.py`
-para regenerarlos. Sirven para comparar directamente cómo se almacenan las
-contraseñas en cada versión (MD5 sin sal en v1 vs. bcrypt en v2).
+### Que editar en `.env` (copiado de `.env.example`)
 
-## Advertencia
+| Variable | Que es | Que poner |
+|---|---|---|
+| `PORT` | Puerto donde escucha el servidor | `3002` funciona sin tocarlo; cambialo si ese puerto ya esta ocupado |
+| `NODE_ENV` | Entorno de ejecucion | `development` en tu maquina; `production` solo si lo despliegas de verdad (activa la cookie `secure`) |
+| `JWT_SECRET` | Clave para firmar los tokens de sesion (JWT) | Un texto aleatorio de al menos 16 caracteres, solo tuyo. Ejemplo rapido para generarlo: `openssl rand -hex 32` |
+| `COOKIE_SECRET` | Clave para firmar cookies | Igual que arriba, otro valor distinto al de `JWT_SECRET` |
+| `DB_PATH` | Ruta del archivo SQLite | Dejar `./data/database.sqlite` (se crea solo); cambialo solo si quieres la base en otro lugar |
+| `CORS_ORIGIN` | Origen permitido para llamar a la API | `http://localhost:3002` si abres la app desde el mismo navegador/puerto; si sirves el frontend desde otro puerto, pon ese origen exacto |
+| `MAX_UPLOAD_MB` | Tamano maximo de archivo adjunto | `5` esta bien para pruebas; sube el numero si necesitas adjuntar archivos mas grandes |
 
-Ambas aplicaciones son material educativo. **No exponer a Internet ni usar
-con datos reales**, especialmente la v1.
+Lo unico realmente obligatorio para que arranque es `JWT_SECRET` y
+`COOKIE_SECRET` (la app falla al iniciar si faltan o son muy cortos, a
+proposito, para no arrancar con secretos debiles). El resto tiene
+valores por defecto razonables.
 
+Nota: `fase1-insegura/` no usa `.env` a proposito -- el secreto de sesion
+esta hardcodeado en `server.js`, que es justamente una de las
+vulnerabilidades documentadas en el informe.
+
+## Tests y pipeline
+
+```bash
+cd fase2-segura
+npm test
+npm run audit
+```
+
+El pipeline de CI (`.github/workflows/ci.yml`) corre lint, tests y
+`npm audit` en cada push/PR sobre `fase2-segura/`.
