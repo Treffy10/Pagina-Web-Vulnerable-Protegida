@@ -9,6 +9,7 @@ No usar en producción, ni exponerlo a internet.
 
 ## Instalación
 
+### Arranque local
 ```bash
 python3 -m venv venv
 source venv/bin/activate
@@ -16,8 +17,27 @@ pip install -r requirements.txt
 python app.py
 ```
 
+### Arranque con Docker
+Asegúrate de tener Docker instalado y ejecutándose.
+
+```bash
+docker build -t pagina-vulnerable:v1 .
+docker run -p 5000:5000 --name pagina-vulnerable-v1 pagina-vulnerable:v1
+```
+
+Después de iniciar el contenedor, accede a `http://localhost:5000`.
+
+> Nota: los datos de `uploads/` y la base de datos SQLite se almacenan dentro del contenedor por defecto. Si quieres conservarlos entre ejecuciones, monta volúmenes:
+>
+> ```bash
+docker run -p 5000:5000 \
+>   -v "%cd%/uploads:/app/uploads" \
+>   -v "%cd%/database.db:/app/database.db" \
+>   --name pagina-vulnerable-v1 pagina-vulnerable:v1
+> ```
+
 La app corre en `http://localhost:5000`. La base de datos SQLite (`database.db`)
-y la carpeta `uploads/` se crean automáticamente al iniciar.
+y la carpeta `uploads/` se crean automáticamente al iniciar si no existen.
 
 ## Flujo básico
 
