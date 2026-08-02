@@ -1,7 +1,0 @@
-__pycache__/
-*.pyc
-database.db
-uploads/*
-!uploads/.gitkeep
-venv/
-.venv/
