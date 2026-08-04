@@ -16,7 +16,7 @@ remediaciones.
 ## Como correr Fase 1 (puerto 3001)
 
 ```bash
-cd fase1-insegura
+cd v1-insecure-clean
 npm install
 npm start
 ```
@@ -26,7 +26,7 @@ Usuario demo: `admin` / `admin123`.
 ## Como correr Fase 2 (puerto 3002)
 
 ```bash
-cd fase2-segura
+cd v2-secure
 cp .env.example .env   # editar segun la tabla de abajo
 npm install
 npm start
