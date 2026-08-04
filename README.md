@@ -3,10 +3,10 @@
 Este repositorio contiene dos versiones de la misma aplicacion (login,
 subida de archivos y CRUD - GET/POST/PUT/DELETE - sobre "notas"):
 
-- `fase1-insegura/`: version construida sin DevSecOps, con vulnerabilidades
+- `v1-insecure-clean/`: version construida sin DevSecOps, con vulnerabilidades
   intencionales para fines de analisis y aprendizaje. **No ejecutar expuesta
   a internet ni usar sus patrones como referencia.**
-- `fase2-segura/`: version refactorizada con arquitectura en capas
+- `v2-secure/`: version refactorizada con arquitectura en capas
   (routes/controllers/services/models), practicas SecDevOps y las
   vulnerabilidades de fase 1 corregidas.
 
